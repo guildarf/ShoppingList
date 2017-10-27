@@ -17,8 +17,8 @@ import java.util.ArrayList;
 
 public class ShoppingListActivity extends AppCompatActivity {
 
-            private ArrayList<String> itemList;
-            private ArrayAdapter<String> adapter;
+            private ArrayList<ShoppingItem> itemList;
+            private ArrayAdapter<ShoppingItem> adapter;
 
             private ListView list;
             private Button btn_add;
@@ -34,14 +34,14 @@ public class ShoppingListActivity extends AppCompatActivity {
                 edit_item = (EditText) findViewById(R.id.insertItem);
 
                 itemList=new ArrayList<>();
-                itemList.add("Fuet");
-                itemList.add("Jamon");
-                itemList.add("Pan");
-                itemList.add("Tomate");
+                itemList.add(new ShoppingItem("Fuet"));
+                itemList.add(new ShoppingItem("Jamon"));
+                itemList.add(new ShoppingItem("Pan"));
+                itemList.add(new ShoppingItem("Tomate"));
 
-                adapter = new ArrayAdapter<>(
+                adapter = new shoppingListAdapter(
                         this,
-                        android.R.layout.simple_list_item_1,
+                        R.layout.shopping_item,
                         itemList
                  );
 
@@ -55,6 +55,15 @@ public class ShoppingListActivity extends AppCompatActivity {
 
 
                 list.setAdapter(adapter);
+
+                list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        itemList.get(i).togleCheched();
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
                 list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapterlistView, View item, int pos, long id) {
@@ -67,7 +76,7 @@ public class ShoppingListActivity extends AppCompatActivity {
     private void maybeRemoveItem(final int pos) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.confirm);
-        builder.setMessage(getResources().getString(R.string.confirm_message)  +" '"+itemList.get(pos)+"' ?");
+        builder.setMessage(getResources().getString(R.string.confirm_message)  +" '"+itemList.get(pos).getText()+"' ?");
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -84,10 +93,11 @@ public class ShoppingListActivity extends AppCompatActivity {
     public void addItem(View view) {
         String item_text=edit_item.getText().toString();
         if(!item_text.isEmpty()){
-            itemList.add(item_text);
+            itemList.add(new ShoppingItem(item_text));
             adapter.notifyDataSetChanged();
             edit_item.setText("");
         }
+        list.smoothScrollToPosition(itemList.size()-1);
 
     }
 }
